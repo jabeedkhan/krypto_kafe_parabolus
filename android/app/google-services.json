@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "676415329705",
+    "project_id": "kryptokafe-1b0ee",
+    "storage_bucket": "kryptokafe-1b0ee.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:676415329705:android:8ae89870fe5129022120b8",
+        "android_client_info": {
+          "package_name": "com.parabolus.kryptokafe"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "676415329705-7b8691383dgq6lsk9vuo2s20fn6esrnj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBsk4sZApLIuXLrY32aTIYsKmmk6lMfBQ8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "676415329705-7b8691383dgq6lsk9vuo2s20fn6esrnj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
