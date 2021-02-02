@@ -5,7 +5,6 @@ import 'package:kryptokafe/customwidgets/custom_textfield.dart';
 import 'package:kryptokafe/customwidgets/primary_button.dart';
 import 'package:kryptokafe/model/new_wallet.dart';
 import 'package:kryptokafe/model/state_codes.dart';
-import 'package:kryptokafe/model/userdetails.dart';
 import 'package:kryptokafe/utils/apptheme.dart';
 import 'package:kryptokafe/utils/assets.dart';
 import 'package:kryptokafe/utils/krypto_sharedperferences.dart';
@@ -50,7 +49,7 @@ class _UserProfileState extends State<UserProfile> {
       countryCode = "US",
       accountStatus = "",
       dateOfBirth = "";
-  UserDetails userDetails;
+  
   NewWallet _wallet;
   Utils utils = Utils();
   var prefernces = KryptoSharedPreferences(), walletId, selectedStateIndex;

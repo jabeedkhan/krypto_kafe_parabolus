@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:kryptokafe/utils/chart_helpers.dart';
-// import 'package:bezier_chart/bezier_chart.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:kryptokafe/customwidgets/nointernetconnection.dart';
@@ -10,8 +9,6 @@ import 'package:kryptokafe/utils/apiclient.dart';
 import 'package:kryptokafe/utils/enums.dart';
 import 'package:kryptokafe/utils/stringocnstants.dart';
 import 'package:kryptokafe/utils/utils.dart';
-// import 'package:draw_graph/draw_graph.dart';
-// import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:mp_chart/mp/chart/line_chart.dart';
@@ -23,13 +20,16 @@ import 'package:mp_chart/mp/core/entry/entry.dart';
 import 'package:mp_chart/mp/core/enums/legend_form.dart';
 import 'package:mp_chart/mp/core/enums/mode.dart';
 import 'package:shimmer/shimmer.dart';
-
+import 'package:kryptokafe/utils/krypto_sharedperferences.dart';
+import 'package:kryptokafe/model/wyre_currencies.dart';
+import 'package:kryptokafe/customwidgets/primary_button.dart';
+import 'package:kryptokafe/model/user_data.dart';
 import 'home.dart';
-// import 'package:draw_graph/models/feature.dart';
 
 class OpenEachCoinHistory extends StatefulWidget {
   final coinId;
-  OpenEachCoinHistory(this.coinId);
+  final coinSymbol;
+  OpenEachCoinHistory(this.coinId, this.coinSymbol);
   @override
   _OpenEachCoinHistoryState createState() => _OpenEachCoinHistoryState();
 }
@@ -39,7 +39,8 @@ class _OpenEachCoinHistoryState extends State<OpenEachCoinHistory> {
   bool internetStatus = true,
       shimmerStatus = true,
       firstTimeCompleted = false,
-      loadingChart = true;
+      loadingChart = true,
+      showBuyButton = false;
   Connectivity connectivity = Connectivity();
   Map coindData = {};
   List historyList = List(), actualHistoryList = List();
@@ -56,21 +57,28 @@ class _OpenEachCoinHistoryState extends State<OpenEachCoinHistory> {
   var presentTime = DateTime.now(), n = 1, a = 'a';
   TimePeriod timePeriod = TimePeriod.oneHour;
   Timer _timer;
+  KryptoSharedPreferences pref = KryptoSharedPreferences();
+  WyreCurrencies currency;
+  UserData userData;
 
   @override
   void initState() {
     super.initState();
     connectivity.checkConnectivity().then(onInternetStatus);
     connectivity.onConnectivityChanged.listen(onInternetStatus);
+    _initialize();
+  }
 
+  _initialize() async {
+    calculateTimeInterval();
+    getCoinData();
+    getHistoryData();
+    currency = WyreCurrencies.fromJson(await pref.read("Currency")) ?? null;
     _timer = Timer.periodic(Duration(seconds: 10), (timer) {
       calculateTimeInterval();
       getCoinData();
       getHistoryData();
     });
-    calculateTimeInterval();
-    getCoinData();
-    getHistoryData();
   }
 
   calculateTimeInterval() {
@@ -187,7 +195,12 @@ class _OpenEachCoinHistoryState extends State<OpenEachCoinHistory> {
                   minValue = double.parse(actualHistoryList[i]['priceUsd']);
             }
           }
-          shimmerStatus = false;
+          if (currency != null) {
+            isCoinAvailable();
+            shimmerStatus = false;
+          } else {
+            getSupportedCurrencies();
+          }
 
           var avgVal = maxValue - minValue;
           avgVal = avgVal * 0.05;
@@ -197,6 +210,39 @@ class _OpenEachCoinHistoryState extends State<OpenEachCoinHistory> {
 
       _initController();
       _initLineData();
+    }
+  }
+
+  isCoinAvailable() {
+    currency.currency.forEach((element) {
+      if (element == widget.coinSymbol) {
+        setState(() {
+          showBuyButton = true;
+        });
+      }
+    });
+  }
+
+  getSupportedCurrencies() async {
+    var dataToBeStored;
+    try {
+      var response = await http.get("https://api.sendwyre.com/v3/pairs?pretty");
+      if (response.statusCode == 200) {
+        Map jsonData = json.decode(response.body);
+        jsonData['supportedExchangePairs'].forEach((key, value) {
+          if (key == "USD") {
+            dataToBeStored = value.toList();
+          }
+        });
+        pref.save("Currency",
+            currency = WyreCurrencies.fromJson({"USD": dataToBeStored}));
+        await isCoinAvailable();
+        setState(() {
+          shimmerStatus = false;
+        });
+      }
+    } catch (e) {
+      print(e);
     }
   }
 
@@ -246,7 +292,7 @@ class _OpenEachCoinHistoryState extends State<OpenEachCoinHistory> {
       backgroundColor: Colors.white,
       dragXEnabled: true,
       dragYEnabled: true,
-      scaleXEnabled: false,
+      scaleXEnabled: true,
       scaleYEnabled: false,
       pinchZoomEnabled: false,
       highlightPerDragEnabled: true,
@@ -310,6 +356,10 @@ class _OpenEachCoinHistoryState extends State<OpenEachCoinHistory> {
 
   @override
   Widget build(BuildContext context) {
+    var mediaqueryHeight = MediaQuery.of(context).size.height;
+    var mediaqueryWidth = MediaQuery.of(context).size.width;
+    var hwSize = mediaqueryHeight + mediaqueryWidth;
+
     return WillPopScope(
       onWillPop: _onbackPressed,
       child: SafeArea(
@@ -499,15 +549,14 @@ class _OpenEachCoinHistoryState extends State<OpenEachCoinHistory> {
                                                         coindData["symbol"]
                                                             .toString()),
                                                 style: TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize:
-                                                      MediaQuery.of(context)
-                                                              .size
-                                                              .height /
-                                                          40.0,
-                                                  fontFamily: StringConstants
-                                                      .oxygenFontnameString,
-                                                )),
+                                                    color: Colors.black,
+                                                    fontSize:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .height /
+                                                            40.0,
+                                                    fontFamily: StringConstants
+                                                        .oxygenFontnameString)),
                                             SizedBox(width: 10.0),
                                             coindData['changePercent24Hr'] !=
                                                     null
@@ -1062,6 +1111,22 @@ class _OpenEachCoinHistoryState extends State<OpenEachCoinHistory> {
                                                       : Colors.black))),
                                     ],
                                   ),
+                                ),
+                                SizedBox(
+                                  height: 50.0,
+                                ),
+                                Visibility(
+                                  visible: showBuyButton,
+                                  child: PrimaryButton({
+                                    "horizontalPadding": mediaqueryWidth / 7.0,
+                                    "verticalPadding": mediaqueryHeight / 75.0,
+                                    "fontSize": hwSize / 75.0,
+                                    "data": "Buy Now"
+                                  }, () {
+
+                                    //check if user has wallet if NO then navigate to create wallet screen 
+                                    //if YES then the take to the particular crypto currency 
+                                  }),
                                 )
                               ],
                             ),

@@ -1,5 +1,5 @@
 class HttpUrl {
-  // static const String BASE_URL = "https://www.salesmerger.com/krypto/api/v1/";
+  
   static const String BASE_URL =
       "http://kryptokafe.com/newapi/index.php/api/v1/";
 

@@ -95,10 +95,14 @@ class _MarketState extends State<Market> {
         setState(() {
           autoLoading = false;
           assetsDataList = actualAssetsDataList.where((element) {
-            return element['name']
-                .toString()
-                .toLowerCase()
-                .contains(value.toString().toLowerCase());
+            return (element['name']
+                    .toString()
+                    .toLowerCase()
+                    .contains(value.toString().toLowerCase()) ||
+                element['symbol']
+                    .toString()
+                    .toLowerCase()
+                    .contains(value.toString().toLowerCase()));
           }).toList();
         });
         //sprint(assetsDataList.toString());
@@ -284,7 +288,7 @@ class _MarketState extends State<Market> {
                       context,
                       MaterialPageRoute(
                           builder: (context) =>
-                              OpenEachCoinHistory(eachCoinData['id'])));
+                              OpenEachCoinHistory(eachCoinData['id'],eachCoinData['symbol'])));
                 },
                 child: Container(
                   padding: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 5.0),
