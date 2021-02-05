@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:kryptokafe/model/user_data.dart';
 import 'package:kryptokafe/screens/home.dart';
 import 'package:kryptokafe/screens/login_signup/login.dart';
@@ -21,6 +23,8 @@ void main() {
   runApp(MyApp());
 }
 
+final navigatorKey = GlobalKey<NavigatorState>();
+
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -33,6 +37,7 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: MyHomePage(),
+      navigatorKey: navigatorKey,
     );
   }
 }
@@ -43,6 +48,9 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+  FlutterLocalNotificationsPlugin flutterLocalNotifications =
+      FlutterLocalNotificationsPlugin();
   var utils = Utils();
   var userId, loginStatus;
   PackageInfo packageInfo;
@@ -73,6 +81,42 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
     connectivity.checkConnectivity().then(onInternetStatus);
     connectivity.onConnectivityChanged.listen(onInternetStatus);
+    var initializationAndroidSetting =
+        AndroidInitializationSettings('@mipmap/launcher_icon');
+
+    var initalizationSettingIOS = new IOSInitializationSettings();
+    var initializationSettings = new InitializationSettings(
+        android: initializationAndroidSetting, iOS: initalizationSettingIOS);
+
+    flutterLocalNotifications.initialize(initializationSettings,
+        onSelectNotification: onSelectNotifications);
+    _firebaseMessaging.getToken().then((value) => print(value));
+    _firebaseMessaging.configure(
+      onMessage: (Map<String, dynamic> message) {
+        return showNotifications(message);
+      },
+    );
+  }
+
+  Future onSelectNotifications(String payload) async {
+    print(payload);
+    showDialog(
+      context: navigatorKey.currentContext,
+      builder: (_) => AlertDialog(
+        title: Text("Here is your payload"),
+        content: Text("Payload"),
+      ),
+    );
+  }
+
+  showNotifications(Map<String, dynamic> message) {
+    var android = AndroidNotificationDetails(
+        'channel_id', "CHANNEL NAME", "Channel description");
+    var iOS = IOSNotificationDetails();
+    var platform = NotificationDetails(android: android, iOS: iOS);
+    flutterLocalNotifications.show(0, message['notification']['title'],
+        message['notification']['body'], platform,
+        payload: message["data"]['payload']);
   }
 
   checkAppUpdate() async {

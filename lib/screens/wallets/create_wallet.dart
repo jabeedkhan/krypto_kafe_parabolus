@@ -49,8 +49,6 @@ class _CreateWalletState extends State<CreateWallet> {
           "v2" +
           WyreApi.WALLETS +
           "?timestamp=${DateTime.now().toUtc().millisecondsSinceEpoch}";
-      // url =
-      //     "https://api.testwyre.com/v2/wallets?timestamp=${DateTime.now().toUtc().millisecondsSinceEpoch}";
       requestBody = {
         "name": user.data.uniqueString,
         "type": "SAVINGS",

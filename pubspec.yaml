@@ -35,9 +35,11 @@ dependencies:
   date_format: null
   dio: ^3.0.10
   draw_graph: null
+  firebase_messaging: ^7.0.3
   flutter_candlesticks: null
   flutter_document_picker: ^4.0.0
   flutter_launcher_icons: null
+  flutter_local_notifications: ^4.0.0
   flutter_staggered_animations: null
   fluttertoast: ^7.1.1
   http: null
@@ -52,7 +54,6 @@ dependencies:
   shimmer: null
   url_launcher: null
   webview_flutter: ^1.0.7
- 
 
 dev_dependencies:
   flutter_test:
@@ -65,7 +66,6 @@ flutter_icons:
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
-
 # The following section is specific to Flutter.
 flutter:
 
@@ -89,10 +89,8 @@ flutter:
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
-
   # For details regarding adding assets from package dependencies, see
   # https://flutter.dev/assets-and-images/#from-packages
-
   # To add custom fonts to your application, add a fonts section here,
   # in this "flutter" section. Each entry in this list should have a
   # "family" key with the font family name, and a "fonts" key with a
@@ -105,6 +103,5 @@ flutter:
     - family: Oxygen
       fonts:
         - asset: assets/fonts/Oxygen-Regular.ttf
-  #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
