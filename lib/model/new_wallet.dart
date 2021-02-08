@@ -71,63 +71,82 @@ class NewWallet {
     int balanceLength = availableBalances.toJson().length;
     var balanceCoinType, depositCoinType, coinName;
     CoinDetails coin;
+
 // write a new logic
-    for (var i = 0; i < addressLength; i++) {
-      if (balanceLength != 0) {
-        for (var j = 0; j < balanceLength; j++) {
-          balanceCoinType = availableBalances.availableBalancesList[j].coinType
-              .toString()
-              .toLowerCase();
-          depositCoinType = depositAddresses
-              .toJson()
-              .keys
-              .elementAt(i)
-              .toString()
-              .toLowerCase();
+    // for (var i = 0; i < addressLength; i++) {
+    //   if (balanceLength != 0) {
+    //     for (var j = 0; j < balanceLength; j++) {
+    //       balanceCoinType = availableBalances.availableBalancesList[j].coinType
+    //           .toString()
+    //           .toLowerCase();
+    //       depositCoinType = depositAddresses
+    //           .toJson()
+    //           .keys
+    //           .elementAt(i)
+    //           .toString()
+    //           .toLowerCase();
 
-          Assets().cryptoCurrencies.forEach((key, value) {
-            if (key == depositAddresses.toJson().keys.elementAt(i))
-              coinName = value;
-          });
+    //       Assets().cryptoCurrencies.forEach((key, value) {
+    //         if (key == depositAddresses.toJson().keys.elementAt(i))
+    //           coinName = value;
+    //       });
 
-          if (depositCoinType == balanceCoinType) {
-            coin = CoinDetails(
-                coinSymbol: depositCoinType,
-                address: depositAddresses.toJson().values.elementAt(i),
-                coinName: coinName,
-                balance:
-                    availableBalances.availableBalancesList[j].balances ?? 0.0);
-          } else if (addressLength != balanceLength) {
-            coin = CoinDetails(
-                coinSymbol: depositCoinType,
-                address: depositAddresses.toJson().values.elementAt(i),
-                coinName: coinName,
-                balance: 0.0);
-          }
-        }
+    //       if (depositCoinType == balanceCoinType) {
+    //         coin = CoinDetails(
+    //             coinSymbol: depositCoinType,
+    //             address: depositAddresses.toJson().values.elementAt(i),
+    //             coinName: coinName,
+    //             balance:
+    //                 availableBalances.availableBalancesList[j].balances ?? 0.0);
+    //       } else if (addressLength != balanceLength) {
+    //         coin = CoinDetails(
+    //             coinSymbol: depositCoinType,
+    //             address: depositAddresses.toJson().values.elementAt(i),
+    //             coinName: coinName,
+    //             balance: 0.0);
+    //       }
+    //     }
+    //   } else {
+    //     depositCoinType = depositAddresses
+    //         .toJson()
+    //         .keys
+    //         .elementAt(i)
+    //         .toString()
+    //         .toLowerCase();
+
+    //     Assets().cryptoCurrencies.forEach((key, value) {
+    //       if (key == depositAddresses.toJson().keys.elementAt(i))
+    //         coinName = value;
+    //     });
+
+    //     coin = CoinDetails(
+    //         coinSymbol: depositCoinType,
+    //         address: depositAddresses.toJson().values.elementAt(i),
+    //         coinName: coinName,
+    //         balance: 0.0);
+    //   }
+    //   if (!coinDetailList.contains(coin)) coinDetailList.add(coin);
+    // }
+
+    Assets().cryptoCurrencies.forEach((key, value) {
+      var depoAddress;
+      if (key == "BTC") {
+        depoAddress = depositAddresses.bTC;
       } else {
-        depositCoinType = depositAddresses
-            .toJson()
-            .keys
-            .elementAt(i)
-            .toString()
-            .toLowerCase();
-
-        Assets().cryptoCurrencies.forEach((key, value) {
-          if (key == depositAddresses.toJson().keys.elementAt(i))
-            coinName = value;
-        });
-
-        coin = CoinDetails(
-            coinSymbol: depositCoinType,
-            address: depositAddresses.toJson().values.elementAt(i),
-            coinName: coinName,
-            balance: 0.0);
+        depoAddress = depositAddresses.eTH;
       }
-      if (!coinDetailList.contains(coin)) coinDetailList.add(coin);
-    }
-
-    // coinDetailList.add(value)
+      coinDetailList.add(
+        CoinDetails(
+            coinSymbol: key,
+            address: depoAddress,
+            coinName: value,
+            balance: availableBalances.availableBalancesList.singleWhere(
+                    (element) => element.coinType == key, orElse: () {
+                  return AvailableBalances(balances: 0.0, coinType: key);
+                }).balances ??
+                0.0),
+      );
+    });
   }
 
   Map<String, dynamic> toJson() {
@@ -169,7 +188,7 @@ class CoinDetails {
   String coinName;
   String coinSymbol;
   String address;
-  double balance;
+  var balance;
 
   CoinDetails({this.coinName, this.coinSymbol, this.address, this.balance});
 }
@@ -183,10 +202,10 @@ class PendingInterestBalances {
   PendingInterestBalances({this.dAI, this.eTH, this.bTC, this.uSDC});
 
   PendingInterestBalances.fromJson(Map<String, dynamic> json) {
-    dAI = json['DAI'];
-    eTH = json['ETH'];
-    bTC = json['BTC'];
-    uSDC = json['USDC'];
+    dAI = double.tryParse(json['DAI'].toString());
+    eTH = double.tryParse(json['ETH'].toString());
+    bTC = double.tryParse(json['BTC'].toString());
+    uSDC = double.tryParse(json['USDC'].toString());
   }
 
   Map<String, dynamic> toJson() {
@@ -220,7 +239,7 @@ class DepositAddresses {
 
 class TotalBalances {
   String coinType;
-  double balances;
+  var balances;
   List<TotalBalances> totalBalancesList = [];
 
   TotalBalances({this.coinType, this.balances});
@@ -242,7 +261,7 @@ class TotalBalances {
 
 class Balances {
   String coinType;
-  double balances;
+  var balances;
   List<Balances> balancesList = [];
 
   Balances({this.coinType, this.balances});
@@ -264,7 +283,7 @@ class Balances {
 
 class AvailableBalances {
   String coinType;
-  double balances;
+  var balances;
   List<AvailableBalances> availableBalancesList = [];
 
   AvailableBalances({this.coinType, this.balances});

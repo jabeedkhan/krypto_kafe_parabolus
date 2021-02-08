@@ -6,7 +6,6 @@ import 'package:kryptokafe/customwidgets/custom_textfield.dart';
 import 'package:kryptokafe/customwidgets/primary_button.dart';
 import 'package:kryptokafe/model/user_data.dart';
 import 'package:kryptokafe/model/new_wallet.dart';
-import 'package:kryptokafe/wyre/wyre_api.dart';
 import 'package:kryptokafe/screens/login_signup/registration.dart';
 import 'package:kryptokafe/utils/http_url.dart';
 import 'package:kryptokafe/utils/krypto_sharedperferences.dart';
@@ -65,7 +64,7 @@ class _LoginState extends State<Login> {
             lookUpWallet();
           else
             Navigator.pushReplacement(
-                context, MaterialPageRoute(builder: (context) => Home()));
+                context, MaterialPageRoute(builder: (context) => Home(0)));
         }
       }
     } catch (e) {
@@ -74,31 +73,22 @@ class _LoginState extends State<Login> {
   }
 
   lookUpWallet() async {
-    var url;
     try {
-      url = WyreApi.WYRE_BASE +
-          "v2" +
-          WyreApi.WALLETS +
-          "/${userData.data.walletId}" +
-          "?timestamp=${DateTime.now().toUtc().millisecondsSinceEpoch}";
-      url =
-          "${WyreApi.WYRE_BASE}v2/wallet/${userData.data.walletId}?timestamp=${DateTime.now().toUtc().millisecondsSinceEpoch}";
-      var request = await http.get(
-        url,
-        headers: {
-          "X-Api-Key": await prefernces.getString(WyreApi.AAPI__KEY),
-          "X-Api-Signature": await utils.signature(url: url)
-        },
-      );
+      var request = await http
+          .post(HttpUrl.LOOKUP_WALLET, body: {"user_id": userData.data.id.toString() });
 
       if (request.statusCode == 200) {
-        NewWallet wallet = NewWallet.fromJson(jsonDecode(request.body));
-        prefernces.save("wallet", wallet);
+        var jsonBody = jsonDecode(request.body);
+
+        if (!jsonBody['error']) {
+          NewWallet wallet = NewWallet.fromJson(jsonBody['data']);
+          prefernces.save("wallet", wallet);
+        }
         setState(() {
           loadingProgress = false;
         });
         Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => Home()));
+            context, MaterialPageRoute(builder: (context) => Home(0)));
       } else {
         utils.displayToast(request.reasonPhrase, context);
         setState(() {

@@ -43,17 +43,15 @@ class _WalletFragmentContainerState extends State<WalletFragmentContainer> {
 
   changeValue() async {
     var jsonData;
-    NewWallet wallet =
-        NewWallet.fromJson(await preferences.read(StringConstants.WALLET_DATA));
+
     var requestBody = {
       "user_id": userData.data.id.toString().trim(),
-      "wallet_id": wallet.id
     };
     //  print(requestBody);
 
     try {
       var responseData =
-          await http.post(HttpUrl.SEND_WALLET, body: requestBody);
+          await http.post(HttpUrl.LOOKUP_WALLET, body: requestBody);
       if (responseData.statusCode == 200) {
         jsonData = jsonDecode(responseData.body);
         if (jsonData['error']) {
@@ -61,7 +59,7 @@ class _WalletFragmentContainerState extends State<WalletFragmentContainer> {
           utils.displayToast(jsonData['message'], context,
               gravity: ToastGravity.CENTER);
         } else {
-          userData = UserData.fromJson(jsonData);
+          userData = UserData.fromJson(jsonData['data']);
           preferences.save(StringConstants.USER_DATA, userData);
           setState(() {
             userType = 1;

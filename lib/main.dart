@@ -10,7 +10,6 @@ import 'package:kryptokafe/screens/login_signup/login.dart';
 import 'package:kryptokafe/screens/login_signup/update_screen.dart';
 import 'package:kryptokafe/utils/http_url.dart';
 import 'package:kryptokafe/utils/krypto_sharedperferences.dart';
-import 'package:kryptokafe/wyre/wyre_api.dart';
 import 'package:http/http.dart' as http;
 import 'package:kryptokafe/utils/stringocnstants.dart';
 import 'package:kryptokafe/utils/utils.dart';
@@ -18,6 +17,7 @@ import 'package:flutter/material.dart';
 import 'package:package_info/package_info.dart';
 import 'package:connectivity/connectivity.dart';
 import 'model/new_wallet.dart';
+import 'package:kryptokafe/model/wyre_currencies.dart';
 
 void main() {
   runApp(MyApp());
@@ -149,7 +149,7 @@ class _MyHomePageState extends State<MyHomePage> {
         if (userData.data != null) {
           checkUserStatus();
         } else
-          getData();
+          getSupportedCoins();
       }
     }
   }
@@ -169,54 +169,57 @@ class _MyHomePageState extends State<MyHomePage> {
         UserData userData = UserData.fromJson(jsonData);
         preferences.save(StringConstants.USER_DATA, userData);
 
-        getData();
+        getSupportedCoins();
       }
     }
   }
 
-  getData() async {
-    try {
-      var request = await http.get(HttpUrl.WDATA);
-      if (request.statusCode == 200) {
-        var jsonData = jsonDecode(request.body);
-        preferences
-          ..setString(WyreApi.AAPI__KEY, jsonData['data']['apiKey'])
-          ..setString(WyreApi.SECRET_KEY, jsonData['data']['secretKey']);
-        if (userData.data != null && userData.data.walletStatus == 1) {
-          lookUpWallet();
-        } else {
-          Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => loginStatus == "1" ? Home() : Login()));
-        }
-      } else {
-        utils.displayToast("Something went wrong, we're fixing it", context);
-      }
-    } catch (e) {}
+  getSupportedCoins() async {
+    // var dataToBeStored;
+    // try {
+    //   var response = await http.get("https://api.sendwyre.com/v3/pairs?pretty");
+    //   if (response.statusCode == 200) {
+    //     Map jsonData = json.decode(response.body);
+    //     jsonData['supportedExchangePairs'].forEach((key, value) {
+    //       if (key == "USD") {
+    //         dataToBeStored = value.toList();
+    //       }
+    //     });
+    //     preferences.save(
+    //         "Currency", WyreCurrencies.fromJson({"USD": dataToBeStored}));
+    if (userData.data != null && userData.data.walletStatus == 1) {
+      lookUpWallet();
+    } else {
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) => loginStatus == "1" ? Home(0) : Login()));
+    }
+    //   } else {
+    //     utils.displayToast("Something went wrong, we're fixing it", context);
+    //   }
+    // } catch (e) {
+    //   print(e);
+    // }
   }
 
   lookUpWallet() async {
-    var url;
     try {
-      url =
-          "${WyreApi.WYRE_BASE}v2/wallet/${userData.data.walletId}?timestamp=${DateTime.now().toUtc().millisecondsSinceEpoch}";
-      var request = await http.get(
-        url,
-        headers: {
-          "X-Api-Key": await preferences.getString(WyreApi.AAPI__KEY),
-          "X-Api-Signature": await utils.signature(url: url)
-        },
-      );
+      var request = await http.post(HttpUrl.LOOKUP_WALLET,
+          body: {"user_id": userData.data.id.toString()});
 
       if (request.statusCode == 200) {
-        NewWallet wallet = NewWallet.fromJson(jsonDecode(request.body));
-        preferences.save(StringConstants.WALLET_DATA, wallet);
+        var jsonBody = jsonDecode(request.body);
+
+        if (!jsonBody['error']) {
+          NewWallet wallet = NewWallet.fromJson(jsonBody['data']);
+          preferences.save("wallet", wallet);
+        }
 
         Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-                builder: (context) => loginStatus == "1" ? Home() : Login()));
+                builder: (context) => loginStatus == "1" ? Home(0) : Login()));
       } else {
         utils.displayToast(request.reasonPhrase, context);
       }

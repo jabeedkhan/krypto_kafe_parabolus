@@ -1,11 +1,12 @@
 import 'dart:convert';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:kryptokafe/model/new_wallet.dart';
+import 'package:kryptokafe/utils/http_url.dart';
 import 'package:kryptokafe/utils/stringocnstants.dart';
 import 'package:http/http.dart' as http;
 import 'package:kryptokafe/model/user_data.dart';
 import 'package:kryptokafe/utils/krypto_sharedperferences.dart';
 import 'package:kryptokafe/utils/utils.dart';
-import 'package:kryptokafe/wyre/wyre_api.dart';
 import 'package:flutter/material.dart';
 import 'package:kryptokafe/utils/apptheme.dart';
 import 'package:shimmer/shimmer.dart';
@@ -19,7 +20,7 @@ class CreateWallet extends StatefulWidget {
 }
 
 class _CreateWalletState extends State<CreateWallet> {
-  var perferences = KryptoSharedPreferences();
+  var preferences = KryptoSharedPreferences();
   String name = "";
   UserData user;
   Utils utils = Utils();
@@ -34,7 +35,7 @@ class _CreateWalletState extends State<CreateWallet> {
   _intialize() async {
     try {
       user =
-          UserData.fromJson(await perferences.read(StringConstants.USER_DATA));
+          UserData.fromJson(await preferences.read(StringConstants.USER_DATA));
       setState(() {
         name = user.data.userName;
         shimmerStatus = false;
@@ -43,44 +44,73 @@ class _CreateWalletState extends State<CreateWallet> {
   }
 
   makeWallet() async {
-    var url, requestBody, jsonData;
+    var requestBody, jsonData;
+    // try {
+    //   url = WyreApi.WYRE_BASE +
+    //       "v2" +
+    //       WyreApi.WALLETS +
+    //       "?timestamp=${DateTime.now().toUtc().millisecondsSinceEpoch}";
+    //   requestBody = {
+    //     "name": user.data.uniqueString,
+    //     "type": "SAVINGS",
+    //   };
+
+    //   var jsonBody = jsonEncode(requestBody);
+
+    //   var response = await http.post(url,
+    //       headers: {
+    //         "Content-Type": "application/json",
+    //         "X-Api-Key": await preferences.getString(WyreApi.AAPI__KEY),
+    //         "X-Api-Signature": await utils.signature(url: url, data: jsonBody)
+    //       },
+    //       body: jsonBody);
+
+    //   if (response.statusCode == 200) {
+    //     jsonData = jsonDecode(response.body);
+    //     NewWallet wallet = NewWallet.fromJson(jsonData);
+    //     preferences.save("wallet", wallet);
+    //     setState(() {
+    //       progressLoading = false;
+    //     });
+    //     widget.notifyParent();
+    //   } else if (response.statusCode == 400) {
+    //     jsonData = jsonDecode(response.body);
+    //     utils.displayDialog(
+    //         context: context, title: "", message: jsonData['message']);
+    //   }
+
+    //   setState(() {
+    //     progressLoading = false;
+    //   });
+    // } catch (e) {
+    //   print(e);
+    // }
+
+    requestBody = {
+      "user_id": user.data.id.toString().trim(),
+    };
+
     try {
-      url = WyreApi.WYRE_BASE +
-          "v2" +
-          WyreApi.WALLETS +
-          "?timestamp=${DateTime.now().toUtc().millisecondsSinceEpoch}";
-      requestBody = {
-        "name": user.data.uniqueString,
-        "type": "SAVINGS",
-      };
-
-      var jsonBody = jsonEncode(requestBody);
-
-      var response = await http.post(url,
-          headers: {
-            "Content-Type": "application/json",
-            "X-Api-Key": await perferences.getString(WyreApi.AAPI__KEY),
-            "X-Api-Signature": await utils.signature(url: url, data: jsonBody)
-          },
-          body: jsonBody);
-
-      if (response.statusCode == 200) {
-        jsonData = jsonDecode(response.body);
-        NewWallet wallet = NewWallet.fromJson(jsonData);
-        perferences.save("wallet", wallet);
-        setState(() {
-          progressLoading = false;
-        });
-        widget.notifyParent();
-      } else if (response.statusCode == 400) {
-        jsonData = jsonDecode(response.body);
-        utils.displayDialog(
-            context: context, title: "", message: jsonData['message']);
+      var responseData =
+          await http.post(HttpUrl.CREATE_WALLET, body: requestBody);
+      if (responseData.statusCode == 200) {
+        jsonData = jsonDecode(responseData.body);
+        if (jsonData['error']) {
+          setState(() {
+            progressLoading = false;
+          });
+          utils.displayDialog(
+              context: context, title: "", message: jsonData['message']);
+        } else {
+          user = UserData.fromJson(jsonData['data']);
+          NewWallet wallet = NewWallet.fromJson(jsonData['data']['wyreResponse']);
+          preferences.save("wallet", wallet);
+          setState(() {
+            progressLoading = false;
+          });
+          widget.notifyParent();
+        }
       }
-
-      setState(() {
-        progressLoading = false;
-      });
     } catch (e) {
       print(e);
     }
@@ -139,12 +169,7 @@ class _CreateWalletState extends State<CreateWallet> {
                             borderRadius: BorderRadius.circular(hwSize / 30.0)),
                         padding: EdgeInsets.all(hwSize / 70.0),
                         color: Colors.blue,
-                        onPressed: () {
-                          makeWallet();
-                          setState(() {
-                            progressLoading = true;
-                          });
-                        },
+                        onPressed: () {},
                         icon: Icon(
                           Icons.account_balance_wallet_outlined,
                           color: Colors.white,

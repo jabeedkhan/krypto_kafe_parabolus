@@ -24,7 +24,10 @@ import 'package:kryptokafe/utils/krypto_sharedperferences.dart';
 import 'package:kryptokafe/model/wyre_currencies.dart';
 import 'package:kryptokafe/customwidgets/primary_button.dart';
 import 'package:kryptokafe/model/user_data.dart';
+import 'package:kryptokafe/model/new_wallet.dart';
 import 'home.dart';
+import 'package:kryptokafe/utils/assets.dart';
+import 'package:kryptokafe/screens/wallets/transfer_wallet.dart';
 
 class OpenEachCoinHistory extends StatefulWidget {
   final coinId;
@@ -53,13 +56,14 @@ class _OpenEachCoinHistoryState extends State<OpenEachCoinHistory> {
       endPeriod,
       chartInterval;
   var chartData;
-  int attempts = 1;
-  var presentTime = DateTime.now(), n = 1, a = 'a';
+  int attempts = 1, index;
+  var presentTime = DateTime.now();
   TimePeriod timePeriod = TimePeriod.oneHour;
   Timer _timer;
   KryptoSharedPreferences pref = KryptoSharedPreferences();
   WyreCurrencies currency;
   UserData userData;
+  NewWallet wallet;
 
   @override
   void initState() {
@@ -70,6 +74,8 @@ class _OpenEachCoinHistoryState extends State<OpenEachCoinHistory> {
   }
 
   _initialize() async {
+    userData = UserData.fromJson(await pref.read(StringConstants.USER_DATA));
+    wallet = NewWallet.fromJson(await pref.read(StringConstants.WALLET_DATA));
     calculateTimeInterval();
     getCoinData();
     getHistoryData();
@@ -195,12 +201,12 @@ class _OpenEachCoinHistoryState extends State<OpenEachCoinHistory> {
                   minValue = double.parse(actualHistoryList[i]['priceUsd']);
             }
           }
-          if (currency != null) {
-            isCoinAvailable();
-            shimmerStatus = false;
-          } else {
-            getSupportedCurrencies();
-          }
+          //   if (currency != null) {
+          isCoinAvailable();
+          shimmerStatus = false;
+          //  } else {
+          //    getSupportedCurrencies();
+          //  }
 
           var avgVal = maxValue - minValue;
           avgVal = avgVal * 0.05;
@@ -214,13 +220,22 @@ class _OpenEachCoinHistoryState extends State<OpenEachCoinHistory> {
   }
 
   isCoinAvailable() {
-    currency.currency.forEach((element) {
-      if (element == widget.coinSymbol) {
+    Assets().cryptoCurrencies.forEach((key, value) {
+      if (key.toUpperCase() == widget.coinSymbol.toUpperCase()) {
         setState(() {
           showBuyButton = true;
         });
       }
     });
+    index = wallet.coinDetailList
+        .indexWhere((element) => element.coinSymbol == widget.coinSymbol);
+    // currency.currency.forEach((element) {
+    //   if (element == widget.coinSymbol) {
+    //     setState(() {
+    //       showBuyButton = true;
+    //     });
+    //   }
+    // });
   }
 
   getSupportedCurrencies() async {
@@ -350,7 +365,7 @@ class _OpenEachCoinHistoryState extends State<OpenEachCoinHistory> {
   Future<bool> _onbackPressed() {
     Navigator.pop(context);
     Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) => Home()));
+        context, MaterialPageRoute(builder: (context) => Home(0)));
     return Future.value(true);
   }
 
@@ -1123,9 +1138,26 @@ class _OpenEachCoinHistoryState extends State<OpenEachCoinHistory> {
                                     "fontSize": hwSize / 75.0,
                                     "data": "Buy Now"
                                   }, () {
-
-                                    //check if user has wallet if NO then navigate to create wallet screen 
-                                    //if YES then the take to the particular crypto currency 
+                                    ///check if user has wallet if [0] then navigate to create wallet screen
+                                    ///if [1] then the take to the particular crypto currency
+                                    if (userData.data.walletStatus == 1) {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  TransferWallet(
+                                                    wallet.coinDetailList,
+                                                    index,
+                                                  )));
+                                    } else {
+                                      Navigator.canPop(context);
+                                      Navigator.pushAndRemoveUntil(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => Home(1)),
+                                        (route) => true,
+                                      );
+                                    }
                                   }),
                                 )
                               ],

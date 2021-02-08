@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
 import 'package:kryptokafe/utils/stringocnstants.dart';
-import 'package:kryptokafe/wyre/wyre_api.dart';
 import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_money_formatter/flutter_money_formatter.dart';
@@ -244,29 +243,29 @@ class Utils {
     );
   }
 
-  signature({url, data}) async {
-    var preferences = KryptoSharedPreferences();
-    var dataTosign = data != null ? url + data : url;
-    var encodedKey =
-        utf8.encode(await preferences.getString(WyreApi.SECRET_KEY));
-    var hmacSha256 = Hmac(sha256, encodedKey);
-    var bytesData = utf8.encode(dataTosign);
-    var digest = hmacSha256.convert(bytesData);
-    String token = digest.toString();
-    return token;
-    //  CryptoJS.enc.Hex.stringify(CryptoJS.HmacSHA256(dataToBeSigned.toString(CryptoJS.enc.Utf8), YOUR_SECRET_KEY));
-  }
+  // signature({url, data}) async {
+  //   var preferences = KryptoSharedPreferences();
+  //   var dataTosign = data != null ? url + data : url;
+  //   var encodedKey =
+  //       utf8.encode(await preferences.getString(WyreApi.SECRET_KEY));
+  //   var hmacSha256 = Hmac(sha256, encodedKey);
+  //   var bytesData = utf8.encode(dataTosign);
+  //   var digest = hmacSha256.convert(bytesData);
+  //   String token = digest.toString();
+  //   return token;
+  //   //  CryptoJS.enc.Hex.stringify(CryptoJS.HmacSHA256(dataToBeSigned.toString(CryptoJS.enc.Utf8), YOUR_SECRET_KEY));
+  // }
 
-  signatureBuffer({url, data}) {
-    var encodedKey = utf8.encode(WyreApi.SECRET_KEY);
-    var hmacSha256 = Hmac(sha256, encodedKey);
-    var urlEncoded = utf8.encode(url);
-    var dataEncoded = utf8.encode(data);
-    var dataTosign = urlEncoded + dataEncoded;
-    var digest = hmacSha256.convert(dataTosign);
-    String token = digest.toString();
-    return token;
-  }
+  // signatureBuffer({url, data}) {
+  //   var encodedKey = utf8.encode(WyreApi.SECRET_KEY);
+  //   var hmacSha256 = Hmac(sha256, encodedKey);
+  //   var urlEncoded = utf8.encode(url);
+  //   var dataEncoded = utf8.encode(data);
+  //   var dataTosign = urlEncoded + dataEncoded;
+  //   var digest = hmacSha256.convert(dataTosign);
+  //   String token = digest.toString();
+  //   return token;
+  // }
 
   progressIndicator() {
     return CircularProgressIndicator(

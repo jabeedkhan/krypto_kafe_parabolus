@@ -3,7 +3,6 @@ import 'package:kryptokafe/model/new_wallet.dart';
 import 'package:kryptokafe/screens/wallets/transfer_wallet.dart';
 import 'package:kryptokafe/utils/apiclient.dart';
 import 'package:kryptokafe/utils/krypto_sharedperferences.dart';
-import 'package:kryptokafe/utils/assets.dart';
 import 'package:kryptokafe/utils/stringocnstants.dart';
 import 'package:flutter/services.dart';
 import 'package:shimmer/shimmer.dart';
@@ -180,9 +179,14 @@ class _WalletOverviewState extends State<WalletOverview> {
                     itemBuilder: (context, index) {
                       return ListTile(
                         leading: CachedNetworkImage(
-                            width: 40.0,
-                            imageUrl: apiClient.getAssetIconURL(
-                                coinDetails[index].coinSymbol)),
+                          width: 40.0,
+                          imageUrl: apiClient
+                              .getAssetIconURL(coinDetails[index].coinSymbol),
+                          errorWidget: (context, url, error) {
+                            return Image.network(
+                                "https://coincap.io/static/logo_mark.png");
+                          },
+                        ),
                         title: Text(
                           coinDetails[index].coinName,
                           style: TextStyle(fontWeight: FontWeight.w600),

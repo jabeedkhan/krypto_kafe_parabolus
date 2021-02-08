@@ -1,10 +1,9 @@
 import 'dart:convert';
+import 'package:kryptokafe/utils/http_url.dart';
 import 'package:kryptokafe/utils/stringocnstants.dart';
 import 'package:flutter/services.dart';
 import 'package:kryptokafe/model/new_wallet.dart';
-import 'package:kryptokafe/utils/assets.dart';
 import 'package:kryptokafe/utils/utils.dart';
-import 'package:kryptokafe/wyre/wyre_api.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:intl/intl.dart';
@@ -32,7 +31,7 @@ class _TransferWalletState extends State<TransferWallet> {
       coinName = "",
       coinSymbol = "",
       countryCode = "",
-      availBalance;
+      availBalance = "";
   TextEditingController amountController = TextEditingController();
   Utils utils = Utils();
   bool buttonEnabled = false;
@@ -40,7 +39,7 @@ class _TransferWalletState extends State<TransferWallet> {
   Connectivity connectivity = Connectivity();
   UserData userData;
 
-  onInternetStatus(value) {
+  onInternetStatus(value) { 
     if (value == ConnectivityResult.mobile ||
         value == ConnectivityResult.wifi) {
       setState(() {
@@ -55,52 +54,51 @@ class _TransferWalletState extends State<TransferWallet> {
 
   walletOrderReservation() async {
     FocusScope.of(context).unfocus();
-    var url, requestBody, jsonData;
-    url = WyreApi.WYRE_BASE +
-        "v3" +
-        "/orders/reserve?timestamp=${DateTime.now().toUtc().millisecondsSinceEpoch}";
+    var requestBody, jsonData;
+    String name = '';
+    if (coinSymbol == "BTC") {
+      name = 'bitcoin';
+    } else {
+      name = 'ethereum';
+    }
 
     requestBody = {
       "sourceAmount": amountController.text.toString(),
-      "country": countryCode,
+      "country": "IN",
       "sourceCurrency": "USD",
       "destCurrency": coinSymbol.toUpperCase(),
-      "dest": "${coinName.toLowerCase()}:$depositAddress",
+      "dest": "${name.toLowerCase()}:$depositAddress",
       "paymentMethod": "debit-card",
-      "amountIncludeFees": true,
-      "referrerAccountId": "AC_8688GQ2B4QE", //LIVE ACCOUNT
-      // "referrerAccountId": "AC_E98CBUNEZCE", // TEST ACCOUNT
-      "redirectUrl":
-          "https://www.salesmerger.com" // TODO change redirect URL find a solution for this
+      "amountIncludeFees": "true",
+      "redirectUrl": " ",
+      "hideTrackBtn": "true"
     };
-    var jsonBody = jsonEncode(requestBody);
+
     try {
       var response = await http.post(
-        url,
-        headers: {
-          "Content-Type": "application/json",
-          "X-Api-Key": await preferences.getString(WyreApi.AAPI__KEY),
-          "X-Api-Signature": await utils.signature(url: url, data: jsonBody)
-        },
-        body: jsonBody,
+        HttpUrl.CHECKOUT,
+        body: requestBody,
       );
       if (response.statusCode == 200) {
         jsonData = jsonDecode(response.body);
         // amountController.clear();
         Navigator.pop(context);
-
-        if (await canLaunch(jsonData['url'])) {
-          //write a function to handle return and call the api to check the transfer
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => WebviewContainer(
-                url: jsonData['url'],
-              ),
-            ),
-          ).then((value) => {lookUpWallet()});
+        if (jsonData['error'] == "true") {
+          utils.displayToast(jsonData['message'], context);
         } else {
-          throw 'Could not launch $url';
+          if (await canLaunch(jsonData['data']['url'])) {
+            //write a function to handle return and call the api to check the transfer
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => WebviewContainer(
+                  url: jsonData['data']['url'],
+                ),
+              ),
+            ).then((value) => {lookUpWallet()});
+          } else {
+            throw 'Could not launch url';
+          }
         }
       } else {
         print(response.body);
@@ -111,37 +109,25 @@ class _TransferWalletState extends State<TransferWallet> {
   }
 
   lookUpWallet() async {
-    var url;
-    var userData =
-        UserData.fromJson(await preferences.read(StringConstants.USER_DATA));
-
     try {
-      url = WyreApi.WYRE_BASE +
-          "v2" +
-          WyreApi.WALLETS +
-          "/${userData.data.walletId}" +
-          "?timestamp=${DateTime.now().toUtc().millisecondsSinceEpoch}";
-      url =
-          "${WyreApi.WYRE_BASE}v2/wallet/${userData.data.walletId}?timestamp=${DateTime.now().toUtc().millisecondsSinceEpoch}";
-      var request = await http.get(
-        url,
-        headers: {
-          "X-Api-Key": await preferences.getString(WyreApi.AAPI__KEY),
-          "X-Api-Signature": await utils.signature(url: url)
-        },
-      );
+      var request = await http.post(HttpUrl.LOOKUP_WALLET,
+          body: {"user_id": userData.data.id.toString()});
 
       if (request.statusCode == 200) {
-        NewWallet wallet = NewWallet.fromJson(jsonDecode(request.body));
-        preferences.save(StringConstants.WALLET_DATA, wallet);
+        var jsonBody = jsonDecode(request.body);
 
-        wallet.coinDetailList.forEach((element) {
-          if (element.coinName == widget.coinDetails[widget.index].coinName) {
-            setState(() {
-              availBalance = element.balance.toString();
-            });
-          }
-        });
+        if (!jsonBody['error']) {
+          NewWallet wallet = NewWallet.fromJson(jsonBody['data']);
+          preferences.save(StringConstants.WALLET_DATA, wallet);
+
+          wallet.coinDetailList.forEach((element) {
+            if (element.coinName == widget.coinDetails[widget.index].coinName) {
+              setState(() {
+                availBalance = element.balance.toString();
+              });
+            }
+          });
+        }
       } else {
         utils.displayToast(request.reasonPhrase, context);
       }
@@ -312,14 +298,7 @@ class _TransferWalletState extends State<TransferWallet> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  // FlatButton(
-                  //   onPressed: () {},
-                  //   child: Text(
-                  //     "SEND",
-                  //     style: TextStyle(color: Colors.white),
-                  //   ),
-                  //   color: Colors.blue,
-                  // ),
+                  
                   FlatButton(
                     onPressed: () {
                       orderBottomSheet(context);

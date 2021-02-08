@@ -4,6 +4,8 @@ import 'package:kryptokafe/screens/wallets/wallet_fragment_container.dart';
 import 'package:flutter/material.dart';
 
 class Home extends StatefulWidget {
+  final selectedIndex;
+  Home(this.selectedIndex);
   @override
   _HomeState createState() => _HomeState();
 }
@@ -15,6 +17,12 @@ class _HomeState extends State<Home> {
     WalletFragmentContainer(),
     ProfileOverview()
   ];
+
+  @override
+  void initState() {
+    selectedIndex = widget.selectedIndex;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
