@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:kryptokafe/utils/chart_helpers.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:connectivity/connectivity.dart';
@@ -79,7 +80,7 @@ class _OpenEachCoinHistoryState extends State<OpenEachCoinHistory> {
     calculateTimeInterval();
     getCoinData();
     getHistoryData();
-    currency = WyreCurrencies.fromJson(await pref.read("Currency")) ?? null;
+
     _timer = Timer.periodic(Duration(seconds: 10), (timer) {
       calculateTimeInterval();
       getCoinData();
@@ -201,12 +202,9 @@ class _OpenEachCoinHistoryState extends State<OpenEachCoinHistory> {
                   minValue = double.parse(actualHistoryList[i]['priceUsd']);
             }
           }
-          //   if (currency != null) {
+
           isCoinAvailable();
           shimmerStatus = false;
-          //  } else {
-          //    getSupportedCurrencies();
-          //  }
 
           var avgVal = maxValue - minValue;
           avgVal = avgVal * 0.05;
@@ -229,36 +227,6 @@ class _OpenEachCoinHistoryState extends State<OpenEachCoinHistory> {
     });
     index = wallet.coinDetailList
         .indexWhere((element) => element.coinSymbol == widget.coinSymbol);
-    // currency.currency.forEach((element) {
-    //   if (element == widget.coinSymbol) {
-    //     setState(() {
-    //       showBuyButton = true;
-    //     });
-    //   }
-    // });
-  }
-
-  getSupportedCurrencies() async {
-    var dataToBeStored;
-    try {
-      var response = await http.get("https://api.sendwyre.com/v3/pairs?pretty");
-      if (response.statusCode == 200) {
-        Map jsonData = json.decode(response.body);
-        jsonData['supportedExchangePairs'].forEach((key, value) {
-          if (key == "USD") {
-            dataToBeStored = value.toList();
-          }
-        });
-        pref.save("Currency",
-            currency = WyreCurrencies.fromJson({"USD": dataToBeStored}));
-        await isCoinAvailable();
-        setState(() {
-          shimmerStatus = false;
-        });
-      }
-    } catch (e) {
-      print(e);
-    }
   }
 
   _initController() {
@@ -1143,7 +1111,7 @@ class _OpenEachCoinHistoryState extends State<OpenEachCoinHistory> {
                                     if (userData.data.walletStatus == 1) {
                                       Navigator.push(
                                           context,
-                                          MaterialPageRoute(
+                                          CupertinoPageRoute(
                                               builder: (context) =>
                                                   TransferWallet(
                                                     wallet.coinDetailList,

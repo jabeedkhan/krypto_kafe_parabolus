@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:kryptokafe/model/new_wallet.dart';
 import 'package:kryptokafe/screens/wallets/transfer_wallet.dart';
 import 'package:kryptokafe/utils/apiclient.dart';
@@ -197,7 +198,7 @@ class _WalletOverviewState extends State<WalletOverview> {
                           FocusScope.of(context).unfocus();
                           Navigator.push(
                               context,
-                              MaterialPageRoute(
+                              CupertinoPageRoute(
                                   builder: (context) => TransferWallet(
                                         coinDetails,
                                         index,

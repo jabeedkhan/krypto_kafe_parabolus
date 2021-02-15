@@ -23,7 +23,7 @@ class UserData {
 }
 
 class Data {
-  int id;
+  var id;
   String userName;
   String userEmail;
   int userDialCode;

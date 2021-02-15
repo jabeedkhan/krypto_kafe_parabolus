@@ -147,14 +147,14 @@ class _MyHomePageState extends State<MyHomePage> {
                     )));
       } else {
         if (userData.data != null) {
-          checkUserStatus();
+          getUserDetails();
         } else
-          getSupportedCoins();
+          checkWalletStatus();
       }
     }
   }
 
-  checkUserStatus() async {
+  getUserDetails() async {
     var jsonData;
     var request = await http.post(HttpUrl.USER_STATUS,
         body: {"userId": userData.data.id.toString()});
@@ -169,38 +169,20 @@ class _MyHomePageState extends State<MyHomePage> {
         UserData userData = UserData.fromJson(jsonData);
         preferences.save(StringConstants.USER_DATA, userData);
 
-        getSupportedCoins();
+        checkWalletStatus();
       }
     }
   }
 
-  getSupportedCoins() async {
-    // var dataToBeStored;
-    // try {
-    //   var response = await http.get("https://api.sendwyre.com/v3/pairs?pretty");
-    //   if (response.statusCode == 200) {
-    //     Map jsonData = json.decode(response.body);
-    //     jsonData['supportedExchangePairs'].forEach((key, value) {
-    //       if (key == "USD") {
-    //         dataToBeStored = value.toList();
-    //       }
-    //     });
-    //     preferences.save(
-    //         "Currency", WyreCurrencies.fromJson({"USD": dataToBeStored}));
+  checkWalletStatus() async {
     if (userData.data != null && userData.data.walletStatus == 1) {
       lookUpWallet();
     } else {
       Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-              builder: (context) => loginStatus == "1" ? Home(0) : Login()));
+              builder: (context) => loginStatus == "1" ? Home(1) : Login()));
     }
-    //   } else {
-    //     utils.displayToast("Something went wrong, we're fixing it", context);
-    //   }
-    // } catch (e) {
-    //   print(e);
-    // }
   }
 
   lookUpWallet() async {
@@ -213,18 +195,18 @@ class _MyHomePageState extends State<MyHomePage> {
 
         if (!jsonBody['error']) {
           NewWallet wallet = NewWallet.fromJson(jsonBody['data']);
-          preferences.save("wallet", wallet);
+          preferences.save(StringConstants.WALLET_DATA, wallet);
         }
 
         Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-                builder: (context) => loginStatus == "1" ? Home(0) : Login()));
+                builder: (context) => loginStatus == "1" ? Home(1) : Login()));
       } else {
         utils.displayToast(request.reasonPhrase, context);
       }
     } catch (e) {
-      print(e);
+      print("LOOK UP WALLET $e");
     }
   }
 

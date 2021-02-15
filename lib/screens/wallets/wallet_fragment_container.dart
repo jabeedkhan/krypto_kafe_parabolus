@@ -42,34 +42,15 @@ class _WalletFragmentContainerState extends State<WalletFragmentContainer> {
   }
 
   changeValue() async {
-    var jsonData;
-
-    var requestBody = {
-      "user_id": userData.data.id.toString().trim(),
-    };
     //  print(requestBody);
 
-    try {
-      var responseData =
-          await http.post(HttpUrl.LOOKUP_WALLET, body: requestBody);
-      if (responseData.statusCode == 200) {
-        jsonData = jsonDecode(responseData.body);
-        if (jsonData['error']) {
-          //  print(jsonData['message']);
-          utils.displayToast(jsonData['message'], context,
-              gravity: ToastGravity.CENTER);
-        } else {
-          userData = UserData.fromJson(jsonData['data']);
-          preferences.save(StringConstants.USER_DATA, userData);
-          setState(() {
-            userType = 1;
-            showLoading = false;
-          });
-        }
-      }
-    } catch (e) {
-      print(e);
-    }
+    userData =
+        UserData.fromJson(await preferences.read(StringConstants.USER_DATA));
+
+    setState(() {
+      userType = userData.data.walletStatus;
+      showLoading = false;
+    });
   }
 
   @override

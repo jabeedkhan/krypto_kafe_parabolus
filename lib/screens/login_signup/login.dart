@@ -64,7 +64,7 @@ class _LoginState extends State<Login> {
             lookUpWallet();
           else
             Navigator.pushReplacement(
-                context, MaterialPageRoute(builder: (context) => Home(0)));
+                context, MaterialPageRoute(builder: (context) => Home(1)));
         }
       }
     } catch (e) {
@@ -74,21 +74,21 @@ class _LoginState extends State<Login> {
 
   lookUpWallet() async {
     try {
-      var request = await http
-          .post(HttpUrl.LOOKUP_WALLET, body: {"user_id": userData.data.id.toString() });
+      var request = await http.post(HttpUrl.LOOKUP_WALLET,
+          body: {"user_id": userData.data.id.toString()});
 
       if (request.statusCode == 200) {
         var jsonBody = jsonDecode(request.body);
 
         if (!jsonBody['error']) {
           NewWallet wallet = NewWallet.fromJson(jsonBody['data']);
-          prefernces.save("wallet", wallet);
+          prefernces.save(StringConstants.WALLET_DATA, wallet);
         }
         setState(() {
           loadingProgress = false;
         });
         Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => Home(0)));
+            context, MaterialPageRoute(builder: (context) => Home(1)));
       } else {
         utils.displayToast(request.reasonPhrase, context);
         setState(() {

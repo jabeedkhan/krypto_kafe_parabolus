@@ -12,7 +12,11 @@ class ProfileOverview extends StatefulWidget {
 
 class _ProfileOverviewState extends State<ProfileOverview> {
   var preferences = KryptoSharedPreferences();
-  String name, email, accountStatus, walletId, totalBalance;
+  String name = "",
+      email = "",
+      accountStatus = "",
+      walletId = "",
+      userCountryName = "";
   UserData user;
   NewWallet wallet;
 
@@ -29,6 +33,7 @@ class _ProfileOverviewState extends State<ProfileOverview> {
       setState(() {
         name = user.data.userName;
         email = user.data.userEmail;
+        userCountryName = user.data.userCountryName;
       });
       if (user.data.walletStatus == 1) {
         wallet = NewWallet.fromJson(
@@ -91,6 +96,12 @@ class _ProfileOverviewState extends State<ProfileOverview> {
                   "Email : $email",
                   style: TextStyle(fontSize: mediaqueryHeight / 45.0),
                 ),
+              ),
+              sizedBox,
+              Padding(
+                padding: EdgeInsets.only(left: 20.0),
+                child: Text("Country : $userCountryName",
+                    style: TextStyle(fontSize: mediaqueryHeight / 45.0)),
               ),
               sizedBox,
               Padding(

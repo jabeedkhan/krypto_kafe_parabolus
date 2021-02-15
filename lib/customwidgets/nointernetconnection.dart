@@ -16,7 +16,6 @@ class _NoInternetConnectionState extends State<NoInternetConnection> {
         children: <Widget>[
           Image.asset(
             'assets/images/connection_lost.png',
-            cacheHeight: 200,
           ),
           Text(
             StringConstants.noInternetConnectionString,

@@ -45,46 +45,6 @@ class _CreateWalletState extends State<CreateWallet> {
 
   makeWallet() async {
     var requestBody, jsonData;
-    // try {
-    //   url = WyreApi.WYRE_BASE +
-    //       "v2" +
-    //       WyreApi.WALLETS +
-    //       "?timestamp=${DateTime.now().toUtc().millisecondsSinceEpoch}";
-    //   requestBody = {
-    //     "name": user.data.uniqueString,
-    //     "type": "SAVINGS",
-    //   };
-
-    //   var jsonBody = jsonEncode(requestBody);
-
-    //   var response = await http.post(url,
-    //       headers: {
-    //         "Content-Type": "application/json",
-    //         "X-Api-Key": await preferences.getString(WyreApi.AAPI__KEY),
-    //         "X-Api-Signature": await utils.signature(url: url, data: jsonBody)
-    //       },
-    //       body: jsonBody);
-
-    //   if (response.statusCode == 200) {
-    //     jsonData = jsonDecode(response.body);
-    //     NewWallet wallet = NewWallet.fromJson(jsonData);
-    //     preferences.save("wallet", wallet);
-    //     setState(() {
-    //       progressLoading = false;
-    //     });
-    //     widget.notifyParent();
-    //   } else if (response.statusCode == 400) {
-    //     jsonData = jsonDecode(response.body);
-    //     utils.displayDialog(
-    //         context: context, title: "", message: jsonData['message']);
-    //   }
-
-    //   setState(() {
-    //     progressLoading = false;
-    //   });
-    // } catch (e) {
-    //   print(e);
-    // }
 
     requestBody = {
       "user_id": user.data.id.toString().trim(),
@@ -102,9 +62,11 @@ class _CreateWalletState extends State<CreateWallet> {
           utils.displayDialog(
               context: context, title: "", message: jsonData['message']);
         } else {
-          user = UserData.fromJson(jsonData['data']);
-          NewWallet wallet = NewWallet.fromJson(jsonData['data']['wyreResponse']);
-          preferences.save("wallet", wallet);
+          user = UserData.fromJson(jsonData);
+          preferences.save(StringConstants.USER_DATA, user);
+          NewWallet wallet =
+              NewWallet.fromJson(jsonData['data']['wyreResponse']);
+          preferences.save(StringConstants.WALLET_DATA, wallet);
           setState(() {
             progressLoading = false;
           });

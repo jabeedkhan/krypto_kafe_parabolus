@@ -64,7 +64,7 @@ class _TransferWalletState extends State<TransferWallet> {
 
     requestBody = {
       "sourceAmount": amountController.text.toString(),
-      "country": "IN",
+      "country": countryCode ,
       "sourceCurrency": "USD",
       "destCurrency": coinSymbol.toUpperCase(),
       "dest": "${name.toLowerCase()}:$depositAddress",
