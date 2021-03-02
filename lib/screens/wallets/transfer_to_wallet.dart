@@ -178,6 +178,8 @@ class _TransferToWalletState extends State<TransferToWallet> {
                   textAlign: TextAlign.center,
                   maxLength: 6,
                   style: TextStyle(
+
+                    
                     fontSize: 45.0,
                     fontWeight: FontWeight.w600,
                   ),
