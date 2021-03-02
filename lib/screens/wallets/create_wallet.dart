@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:kryptokafe/model/new_wallet.dart';
 import 'package:kryptokafe/utils/http_url.dart';
 import 'package:kryptokafe/utils/stringocnstants.dart';

@@ -1,15 +1,10 @@
-import 'dart:convert';
-import 'package:kryptokafe/utils/http_url.dart';
 import 'package:kryptokafe/utils/stringocnstants.dart';
-import 'package:http/http.dart' as http;
-import 'package:kryptokafe/model/new_wallet.dart';
 import 'package:kryptokafe/model/user_data.dart';
 import 'package:kryptokafe/screens/wallets/create_wallet.dart';
-import 'package:kryptokafe/screens/wallets/wallet_overview.dart';
+import 'package:kryptokafe/screens/wallets/wallet_list.dart';
 import 'package:kryptokafe/utils/krypto_sharedperferences.dart';
 import 'package:flutter/material.dart';
 import 'package:kryptokafe/utils/utils.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
 class WalletFragmentContainer extends StatefulWidget {
   @override
@@ -61,6 +56,6 @@ class _WalletFragmentContainerState extends State<WalletFragmentContainer> {
           )
         : userType == 0
             ? CreateWallet(notifyParent: changeValue)
-            : WalletOverview();
+            : WalletList();
   }
 }

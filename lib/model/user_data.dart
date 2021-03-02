@@ -29,6 +29,7 @@ class Data {
   int userDialCode;
   String userCountryName;
   String userCountryCode;
+  String userCurrencyCode;
   String uniqueString;
   int walletStatus;
   String walletId;
@@ -40,6 +41,7 @@ class Data {
       this.userDialCode,
       this.userCountryName,
       this.userCountryCode,
+      this.userCurrencyCode,
       this.uniqueString,
       this.walletStatus,
       this.walletId});
@@ -51,6 +53,7 @@ class Data {
     userDialCode = json['user_country_calling_code'];
     userCountryName = json['user_country_name'];
     userCountryCode = json['user_country_code'];
+    userCurrencyCode = json['currencyCode'];
     uniqueString = json['unique_string'];
     walletStatus = json['wallet_status'];
     walletId = json['wallet_id'];
@@ -64,6 +67,7 @@ class Data {
     data['user_country_calling_code'] = this.userDialCode;
     data['user_country_name'] = this.userCountryName;
     data['user_country_code'] = this.userCountryCode;
+    data['currencyCode'] = this.userCurrencyCode;
     data['unique_string'] = this.uniqueString;
     data['wallet_status'] = this.walletStatus;
     data['wallet_id'] = this.walletId;

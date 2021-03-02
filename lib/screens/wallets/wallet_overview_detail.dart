@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
+import 'package:kryptokafe/screens/wallets/transfer_to_wallet.dart';
 import 'package:kryptokafe/utils/http_url.dart';
 import 'package:kryptokafe/utils/stringocnstants.dart';
 import 'package:flutter/services.dart';
@@ -14,17 +16,16 @@ import 'webview_container.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:kryptokafe/model/user_data.dart';
 
-class TransferWallet extends StatefulWidget {
+class WalletOverviewDetail extends StatefulWidget {
   final List<CoinDetails> coinDetails;
   final index;
-
-  TransferWallet(this.coinDetails, this.index);
+  WalletOverviewDetail(this.coinDetails, this.index);
 
   @override
-  _TransferWalletState createState() => _TransferWalletState();
+  _WalletOverviewDetailState createState() => _WalletOverviewDetailState();
 }
 
-class _TransferWalletState extends State<TransferWallet> {
+class _WalletOverviewDetailState extends State<WalletOverviewDetail> {
   String buttonText = "BUY NOW", depositAddress = "";
   var numberFormatter = NumberFormat('##,###.0#', 'en_US'),
       preferences = KryptoSharedPreferences(),
@@ -39,7 +40,7 @@ class _TransferWalletState extends State<TransferWallet> {
   Connectivity connectivity = Connectivity();
   UserData userData;
 
-  onInternetStatus(value) { 
+  onInternetStatus(value) {
     if (value == ConnectivityResult.mobile ||
         value == ConnectivityResult.wifi) {
       setState(() {
@@ -64,7 +65,7 @@ class _TransferWalletState extends State<TransferWallet> {
 
     requestBody = {
       "sourceAmount": amountController.text.toString(),
-      "country": countryCode ,
+      "country": countryCode,
       "sourceCurrency": "USD",
       "destCurrency": coinSymbol.toUpperCase(),
       "dest": "${name.toLowerCase()}:$depositAddress",
@@ -87,7 +88,7 @@ class _TransferWalletState extends State<TransferWallet> {
           utils.displayToast(jsonData['message'], context);
         } else {
           if (await canLaunch(jsonData['data']['url'])) {
-            //write a function to handle return and call the api to check the transfer
+            //handle return and call the api to check the updated wallet balance
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -136,8 +137,57 @@ class _TransferWalletState extends State<TransferWallet> {
     }
   }
 
+  transferDialog(context) {
+    return showDialog(
+      context: context,
+      child: AlertDialog(
+          title: Center(child: Text('Transfer To')),
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(10.0))),
+          content: Container(
+            height: 100.0,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                FlatButton(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: new BorderRadius.circular(5.0),
+                  ),
+                  color: Colors.blue,
+                  onPressed: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      CupertinoPageRoute(
+                        builder: (context) =>
+                            TransferToWallet(coinSymbol, userData ),
+                      ),
+                    );
+                  },
+                  child: Text(
+                    "Wallet",
+                    style: TextStyle(color: Colors.white, fontSize: 20.0),
+                  ),
+                ),
+                FlatButton(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: new BorderRadius.circular(5.0),
+                  ),
+                  color: Colors.blue,
+                  onPressed: () {},
+                  child: Text(
+                    "Bank",
+                    style: TextStyle(color: Colors.white, fontSize: 20.0),
+                  ),
+                ),
+              ],
+            ),
+          )),
+    );
+  }
+
   orderBottomSheet(context) {
-    showModalBottomSheet(
+    return showModalBottomSheet(
         context: context,
         builder: (BuildContext cntxt) {
           return StatefulBuilder(
@@ -290,7 +340,7 @@ class _TransferWalletState extends State<TransferWallet> {
               Text(
                 availBalance,
                 style: TextStyle(
-                    fontSize: mediaqueryHeight / 35.0,
+                    fontSize: mediaqueryHeight / 25.0,
                     fontWeight: FontWeight.w600),
               ),
               Text(coinSymbol),
@@ -298,7 +348,17 @@ class _TransferWalletState extends State<TransferWallet> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  
+                  FlatButton(
+                    onPressed: () {
+                      // orderBottomSheet(context);
+                      transferDialog(context);
+                    },
+                    child: Text(
+                      "TRANSFER",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    color: Colors.blue,
+                  ),
                   FlatButton(
                     onPressed: () {
                       orderBottomSheet(context);
@@ -309,14 +369,6 @@ class _TransferWalletState extends State<TransferWallet> {
                     ),
                     color: Colors.blue,
                   ),
-                  // FlatButton(
-                  //   onPressed: () {},
-                  //   child: Text(
-                  //     "Copy",
-                  //     style: TextStyle(color: Colors.white),
-                  //   ),
-                  //   color: Colors.blue,
-                  // ),
                 ],
               ),
               Divider(

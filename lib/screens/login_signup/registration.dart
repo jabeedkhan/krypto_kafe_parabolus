@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:connectivity/connectivity.dart';
 import 'package:country_list_pick/country_list_pick.dart';
+import 'package:currency_pickers/utils/utils.dart';
 import 'package:kryptokafe/customwidgets/custom_textfield.dart';
 import 'package:kryptokafe/customwidgets/primary_button.dart';
 import 'package:kryptokafe/utils/http_url.dart';
@@ -10,6 +11,7 @@ import 'package:kryptokafe/utils/stringocnstants.dart';
 import 'package:kryptokafe/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:currency_pickers/country.dart';
 
 class Registeration extends StatefulWidget {
   @override
@@ -28,8 +30,8 @@ class _RegisterationState extends State<Registeration> {
       countryCode = "IN",
       prefernces = KryptoSharedPreferences();
   Utils utils = Utils();
+  Country country;
 
-  // final sharedPreferences = SaphireSharedPreferences();
   final connectivity = Connectivity();
   final _loginformKey = GlobalKey<FormState>();
 
@@ -62,13 +64,15 @@ class _RegisterationState extends State<Registeration> {
   }
 
   regApi(BuildContext buildContext) async {
+    country = CurrencyPickerUtils.getCountryByIsoCode(countryCode);
     var jsonData;
     var requestBody = {
       "emailId": emailID,
       "name": name,
       "countryCallingCode": countryDialCode,
       "countryName": countryName,
-      "countryCode": countryCode
+      "countryCode": countryCode,
+      "currencyCode": country.currencyCode
     };
     var responseData = await http.post(HttpUrl.REGESTRATION, body: requestBody);
     try {

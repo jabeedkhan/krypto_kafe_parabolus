@@ -131,26 +131,30 @@ class _MyHomePageState extends State<MyHomePage> {
           UserData.fromJson(await preferences.read(StringConstants.USER_DATA));
 
     var jsonData;
-    var request = await http.post(HttpUrl.APP_UPDATE, body: {
-      "platform": Platform.isAndroid ? "android" : "ios",
-      "versionDetails": version.toString()
-    });
 
-    if (request.statusCode == 200) {
-      jsonData = jsonDecode(request.body);
-      if (jsonData["error"]) {
-        Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-                builder: (context) => UpdateScreen(
-                      url: jsonData["data"],
-                    )));
-      } else {
-        if (userData.data != null) {
-          getUserDetails();
-        } else
-          checkWalletStatus();
+    try {
+      var request = await http.post(HttpUrl.APP_UPDATE, body: {
+        "platform": Platform.isAndroid ? "android" : "ios",
+        "versionDetails": version.toString()
+      });
+      if (request.statusCode == 200) {
+        jsonData = jsonDecode(request.body);
+        if (jsonData["error"]) {
+          Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => UpdateScreen(
+                        url: jsonData["data"],
+                      )));
+        } else {
+          if (userData.data != null) {
+            getUserDetails();
+          } else
+            checkWalletStatus();
+        }
       }
+    } catch (e) {
+      print(e);
     }
   }
 

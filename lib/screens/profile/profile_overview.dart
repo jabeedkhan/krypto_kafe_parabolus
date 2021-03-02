@@ -72,9 +72,6 @@ class _ProfileOverviewState extends State<ProfileOverview> {
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
-          leading: BackButton(
-            color: Colors.black,
-          ),
           elevation: 0.0,
           backgroundColor: Colors.white,
         ),

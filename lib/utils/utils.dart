@@ -1,12 +1,9 @@
-import 'dart:convert';
-
-import 'package:crypto/crypto.dart';
+import 'package:intl/intl.dart';
 import 'package:kryptokafe/utils/stringocnstants.dart';
 import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_money_formatter/flutter_money_formatter.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:kryptokafe/utils/krypto_sharedperferences.dart';
 
 class Utils {
   final fullnameRegex = RegExp(r"^(\w.+\s).+");
@@ -15,6 +12,15 @@ class Utils {
     r"[a-z0-9!#$%&'*+\=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+\=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+(?:[A-Z]{2}|com|edu|org|net|gov|mil|in|info)\b",
   );
   FToast fToast = FToast();
+  static const _locale = 'in';
+
+  formatNumber(String s) {
+    return NumberFormat.decimalPattern(_locale).format(int.parse(s));
+  }
+
+  String currency(String country) {
+    return NumberFormat.compactSimpleCurrency(locale: country).currencySymbol;
+  }
 
   void displayToast(String message, BuildContext context,
       {Color bgcolors, gravity}) {

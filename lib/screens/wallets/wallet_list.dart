@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:kryptokafe/model/new_wallet.dart';
-import 'package:kryptokafe/screens/wallets/transfer_wallet.dart';
+import 'package:kryptokafe/screens/wallets/wallet_overview_detail.dart';
 import 'package:kryptokafe/utils/apiclient.dart';
 import 'package:kryptokafe/utils/krypto_sharedperferences.dart';
 import 'package:kryptokafe/utils/stringocnstants.dart';
@@ -9,12 +9,12 @@ import 'package:flutter/services.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:flutter/material.dart';
 
-class WalletOverview extends StatefulWidget {
+class WalletList extends StatefulWidget {
   @override
-  _WalletOverviewState createState() => _WalletOverviewState();
+  _WalletListState createState() => _WalletListState();
 }
 
-class _WalletOverviewState extends State<WalletOverview> {
+class _WalletListState extends State<WalletList> {
   String walletId;
   var preferences = KryptoSharedPreferences(), amount, balance = "0.0";
   NewWallet walletData;
@@ -199,7 +199,7 @@ class _WalletOverviewState extends State<WalletOverview> {
                           Navigator.push(
                               context,
                               CupertinoPageRoute(
-                                  builder: (context) => TransferWallet(
+                                  builder: (context) => WalletOverviewDetail(
                                         coinDetails,
                                         index,
                                       ))).whenComplete(() => _inititalize());

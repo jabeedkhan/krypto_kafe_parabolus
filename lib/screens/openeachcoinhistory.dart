@@ -28,7 +28,7 @@ import 'package:kryptokafe/model/user_data.dart';
 import 'package:kryptokafe/model/new_wallet.dart';
 import 'home.dart';
 import 'package:kryptokafe/utils/assets.dart';
-import 'package:kryptokafe/screens/wallets/transfer_wallet.dart';
+import 'package:kryptokafe/screens/wallets/wallet_overview_detail.dart';
 
 class OpenEachCoinHistory extends StatefulWidget {
   final coinId;
@@ -62,7 +62,7 @@ class _OpenEachCoinHistoryState extends State<OpenEachCoinHistory> {
   TimePeriod timePeriod = TimePeriod.oneHour;
   Timer _timer;
   KryptoSharedPreferences pref = KryptoSharedPreferences();
-  WyreCurrencies currency;
+  WyreCurrencyPair currency;
   UserData userData;
   NewWallet wallet;
 
@@ -1113,7 +1113,7 @@ class _OpenEachCoinHistoryState extends State<OpenEachCoinHistory> {
                                           context,
                                           CupertinoPageRoute(
                                               builder: (context) =>
-                                                  TransferWallet(
+                                                  WalletOverviewDetail(
                                                     wallet.coinDetailList,
                                                     index,
                                                   )));
