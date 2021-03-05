@@ -32,7 +32,7 @@ class _CustomTextfieldState extends State<CustomTextfield> {
       decoration: InputDecoration(
           prefix: widget.textData['prefix'],
           hintText: widget.textData["hintText"],
-          hintStyle: TextStyle(color: Color(AppTheme.gray6)),
+          hintStyle: TextStyle(color: Color(AppTheme.gray3)),
           counterText: widget.textData["counterText"],
           errorStyle: TextStyle(color: Colors.blue)),
       validator: widget.textData["validator"],

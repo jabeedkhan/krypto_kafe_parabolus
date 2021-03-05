@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
-import 'package:kryptokafe/screens/wallets/transfer_to_wallet.dart';
+import 'package:kryptokafe/screens/wallets/transfer/transfer_to_wallet.dart';
+import 'package:kryptokafe/utils/enums.dart';
 import 'package:kryptokafe/utils/http_url.dart';
 import 'package:kryptokafe/utils/stringocnstants.dart';
 import 'package:flutter/services.dart';
@@ -15,6 +16,8 @@ import 'package:url_launcher/url_launcher.dart';
 import 'webview_container.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:kryptokafe/model/user_data.dart';
+import 'package:kryptokafe/customwidgets/nointernetconnection.dart';
+import 'package:kryptokafe/screens/wallets/transfer/transfer_to_bank.dart';
 
 class WalletOverviewDetail extends StatefulWidget {
   final List<CoinDetails> coinDetails;
@@ -159,10 +162,10 @@ class _WalletOverviewDetailState extends State<WalletOverviewDetail> {
                     Navigator.push(
                       context,
                       CupertinoPageRoute(
-                        builder: (context) =>
-                            TransferToWallet(coinSymbol, userData ),
+                        builder: (context) => TransferToWallet(
+                            coinSymbol, userData, TransferType.wallet, ""),
                       ),
-                    );
+                    ).then((value) => lookUpWallet());
                   },
                   child: Text(
                     "Wallet",
@@ -174,7 +177,15 @@ class _WalletOverviewDetailState extends State<WalletOverviewDetail> {
                     borderRadius: new BorderRadius.circular(5.0),
                   ),
                   color: Colors.blue,
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      CupertinoPageRoute(
+                        builder: (context) => BankTransfer(coinSymbol),
+                      ),
+                    );
+                  },
                   child: Text(
                     "Bank",
                     style: TextStyle(color: Colors.white, fontSize: 20.0),
@@ -333,72 +344,74 @@ class _WalletOverviewDetailState extends State<WalletOverviewDetail> {
               color: Colors.black,
             ),
           ),
-          body: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              sizedBox,
-              Text(
-                availBalance,
-                style: TextStyle(
-                    fontSize: mediaqueryHeight / 25.0,
-                    fontWeight: FontWeight.w600),
-              ),
-              Text(coinSymbol),
-              sizedBox,
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  FlatButton(
-                    onPressed: () {
-                      // orderBottomSheet(context);
-                      transferDialog(context);
-                    },
-                    child: Text(
-                      "TRANSFER",
-                      style: TextStyle(color: Colors.white),
+          body: internetStatus
+              ? Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    sizedBox,
+                    Text(
+                      availBalance,
+                      style: TextStyle(
+                          fontSize: mediaqueryHeight / 25.0,
+                          fontWeight: FontWeight.w600),
                     ),
-                    color: Colors.blue,
-                  ),
-                  FlatButton(
-                    onPressed: () {
-                      orderBottomSheet(context);
-                    },
-                    child: Text(
-                      "BUY",
-                      style: TextStyle(color: Colors.white),
+                    Text(coinSymbol),
+                    sizedBox,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        FlatButton(
+                          onPressed: () {
+                            // orderBottomSheet(context);
+                            transferDialog(context);
+                          },
+                          child: Text(
+                            "TRANSFER",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          color: Colors.blue,
+                        ),
+                        FlatButton(
+                          onPressed: () {
+                            orderBottomSheet(context);
+                          },
+                          child: Text(
+                            "BUY",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          color: Colors.blue,
+                        ),
+                      ],
                     ),
-                    color: Colors.blue,
-                  ),
-                ],
-              ),
-              Divider(
-                height: 2.0,
-              ),
-              SizedBox(
-                height: mediaqueryHeight / 20.0,
-              ),
-              QrImage(
-                data: depositAddress,
-                version: QrVersions.auto,
-                size: hwSize / 5.0,
-              ),
-              sizedBox,
-              Text(
-                depositAddress,
-                style: TextStyle(fontSize: 16.0),
-                textAlign: TextAlign.start,
-              ),
-              FlatButton(
-                child: Text("Tap to copy"),
-                onPressed: () {
-                  Clipboard.setData(ClipboardData(text: depositAddress))
-                      .whenComplete(() =>
-                          utils.displayToast("copied to clipboard", context));
-                },
-              )
-              //tap to copy fuction
-            ],
-          ),
+                    Divider(
+                      height: 2.0,
+                    ),
+                    SizedBox(
+                      height: mediaqueryHeight / 20.0,
+                    ),
+                    QrImage(
+                      data: depositAddress,
+                      version: QrVersions.auto,
+                      size: hwSize / 5.0,
+                    ),
+                    sizedBox,
+                    Text(
+                      depositAddress,
+                      style: TextStyle(fontSize: 16.0),
+                      textAlign: TextAlign.start,
+                    ),
+                    FlatButton(
+                      child: Text("Tap to copy"),
+                      onPressed: () {
+                        Clipboard.setData(ClipboardData(text: depositAddress))
+                            .whenComplete(() => utils.displayToast(
+                                "copied to clipboard", context));
+                      },
+                    )
+                    //tap to copy fuction
+                  ],
+                )
+              : NoInternetConnection(),
         ),
       ),
     );

@@ -4,6 +4,7 @@ import 'package:kryptokafe/screens/login_signup/login.dart';
 import 'package:kryptokafe/utils/krypto_sharedperferences.dart';
 import 'package:kryptokafe/utils/stringocnstants.dart';
 import 'package:flutter/material.dart';
+import 'package:kryptokafe/screens/profile/transfer_history.dart';
 
 class ProfileOverview extends StatefulWidget {
   @override
@@ -111,6 +112,22 @@ class _ProfileOverviewState extends State<ProfileOverview> {
                 indent: 30.0,
                 endIndent: 30.0,
                 height: 3.0,
+              ),
+              ListTile(
+                leading: Icon(
+                  Icons.history,
+                  color: Colors.blue,
+                ),
+                trailing:
+                    Icon(Icons.chevron_right_outlined, color: Colors.black),
+                title: Text("Transaction History",
+                    style: TextStyle(fontSize: mediaqueryHeight / 45.0)),
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => TransferHistory()));
+                },
               ),
               ListTile(
                 leading: Icon(

@@ -46,4 +46,8 @@ class StringConstants {
 
   static final String appUpdate =
       "https://www.salesmerger.com/krypto/api/v1/common/appUpdate";
+
+  static const String W2W = "WALLET_TO_WALLET";
+  static const String W2E = "WALLET_TO_EXTWALLET";
+  static const String W2B = "WALLET_TO_BANK";
 }

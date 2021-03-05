@@ -73,4 +73,7 @@ class Data {
     data['wallet_id'] = this.walletId;
     return data;
   }
+  
 }
+
+

@@ -17,7 +17,6 @@ import 'package:flutter/material.dart';
 import 'package:package_info/package_info.dart';
 import 'package:connectivity/connectivity.dart';
 import 'model/new_wallet.dart';
-import 'package:kryptokafe/model/wyre_currencies.dart';
 
 void main() {
   runApp(MyApp());

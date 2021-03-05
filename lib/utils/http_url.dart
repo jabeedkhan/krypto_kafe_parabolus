@@ -13,8 +13,10 @@ class HttpUrl {
   static const String CHECKOUT = BASE_URL + "user/purchaseCoin";
   static const String CREATE_TRANSFER = BASE_URL + "user/createTransfer";
   static const String CONFIRM_TRANSFER = BASE_URL + "user/confirmReqTransfer";
-  static const String GET_TRANSFER = BASE_URL + "user/getTransferReqDetails";
+  static const String GET_TRANSFER_DETAIL = BASE_URL + "user/getTransferReqDetails";
   static const String GET_ALL_TRANSFER = BASE_URL + "user/getUserTransfers";
+  static const String CREATE_PAYMENT_METHOD =
+      BASE_URL + "user/createPaymentMethod";
 
   static const String EXCHANGE_RATES =
       "https://api.sendwyre.com/v3/rates?pretty&as=priced";

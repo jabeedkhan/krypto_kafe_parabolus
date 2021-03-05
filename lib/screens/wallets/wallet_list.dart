@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:kryptokafe/model/new_wallet.dart';
@@ -8,6 +9,9 @@ import 'package:kryptokafe/utils/stringocnstants.dart';
 import 'package:flutter/services.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:kryptokafe/model/user_data.dart';
+import 'package:kryptokafe/utils/http_url.dart';
 
 class WalletList extends StatefulWidget {
   @override
@@ -26,6 +30,7 @@ class _WalletListState extends State<WalletList> {
   Widget appTitle;
   TextField searchBarTextField;
   List<CoinDetails> coinDetails = [];
+  UserData userData;
 
   @override
   void initState() {
@@ -42,15 +47,32 @@ class _WalletListState extends State<WalletList> {
       // inputFormatters: [FilteringTextInputFormatter.allow(r"^[a-zA-Z]")],
       onChanged: updateSearch,
     );
+    userData =
+        UserData.fromJson(await preferences.read(StringConstants.USER_DATA));
+    lookUpWallet();
+  }
 
-    walletData =
-        NewWallet.fromJson(await preferences.read(StringConstants.WALLET_DATA));
+  lookUpWallet() async {
+    try {
+      var request = await http.post(HttpUrl.LOOKUP_WALLET,
+          body: {"user_id": userData.data.id.toString()});
 
-    coinDetails = walletData.coinDetailList;
-    setState(() {
-      walletId = walletData.id;
-      showShimmer = false;
-    });
+      if (request.statusCode == 200) {
+        var jsonBody = jsonDecode(request.body);
+
+        if (!jsonBody['error']) {
+          walletData = NewWallet.fromJson(jsonBody['data']);
+          preferences.save(StringConstants.WALLET_DATA, walletData);
+          coinDetails = walletData.coinDetailList;
+          setState(() {
+            walletId = walletData.id;
+            showShimmer = false;
+          });
+        }
+      }
+    } catch (e) {
+      print(e);
+    }
   }
 
   searchBar() {
