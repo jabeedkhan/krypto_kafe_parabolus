@@ -178,6 +178,8 @@ class _BankTransferState extends State<BankTransfer> {
           child: Column(
             children: [
               loadingProgress ? LinearProgressIndicator() : SizedBox(),
+              Text(
+                  "Wallet to bank transfer is only supported for US citizens."),
               Row(
                 children: [
                   Expanded(
