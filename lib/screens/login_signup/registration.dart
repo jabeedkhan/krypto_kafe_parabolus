@@ -25,9 +25,9 @@ class _RegisterationState extends State<Registeration> {
   FocusNode nameFocusNode = FocusNode(), emailFocusNode = FocusNode();
   var emailID,
       name,
-      countryDialCode = "91",
-      countryName = "India",
-      countryCode = "IN",
+      countryDialCode = "+1",
+      countryName = "United States",
+      countryCode = "US",
       prefernces = KryptoSharedPreferences();
   Utils utils = Utils();
   Country country;

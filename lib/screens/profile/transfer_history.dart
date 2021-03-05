@@ -148,23 +148,6 @@ class _TransferHistoryState extends State<TransferHistory> {
                                 SizedBox(
                                   height: 10.0,
                                 ),
-                                Row(
-                                  children: [
-                                    Text(
-                                      "Payment Request Status :",
-                                      style: headerStyle(),
-                                    ),
-                                    Text(
-                                      transferData[index]
-                                              ["payment_req_status"] ??
-                                          "N/A",
-                                      style: subStyle(),
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(
-                                  height: 10.0,
-                                ),
                                 Text(
                                   transferData[index]["status"] ?? "N/A",
                                   style: TextStyle(
