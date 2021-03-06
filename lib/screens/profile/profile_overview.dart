@@ -54,6 +54,8 @@ class _ProfileOverviewState extends State<ProfileOverview> {
 
   logout() {
     preferences.remove("user");
+    if (user.data.walletStatus == 1)
+      preferences.remove(StringConstants.WALLET_DATA);
     preferences.setString(StringConstants.LOGIN_STATUS, "0");
     Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => Login()),

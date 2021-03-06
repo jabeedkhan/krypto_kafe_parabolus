@@ -35,7 +35,8 @@ class _WalletOverviewDetailState extends State<WalletOverviewDetail> {
       coinName = "",
       coinSymbol = "",
       countryCode = "",
-      availBalance = "";
+      availBalance = "",
+      currencySymbol = '';
   TextEditingController amountController = TextEditingController();
   Utils utils = Utils();
   bool buttonEnabled = false;
@@ -69,7 +70,7 @@ class _WalletOverviewDetailState extends State<WalletOverviewDetail> {
     requestBody = {
       "sourceAmount": amountController.text.toString(),
       "country": countryCode,
-      "sourceCurrency": "USD",
+      "sourceCurrency": userData.data.userCurrencyCode,
       "destCurrency": coinSymbol.toUpperCase(),
       "dest": "${name.toLowerCase()}:$depositAddress",
       "paymentMethod": "debit-card",
@@ -248,7 +249,7 @@ class _WalletOverviewDetailState extends State<WalletOverviewDetail> {
                           ),
                         ),
                         Text(
-                          "\$",
+                          currencySymbol,
                           style: TextStyle(
                             color: Colors.black54,
                             fontSize: 26.0,
@@ -304,7 +305,11 @@ class _WalletOverviewDetailState extends State<WalletOverviewDetail> {
   _initialize() async {
     userData =
         UserData.fromJson(await preferences.read(StringConstants.USER_DATA));
+
     setState(() {
+      currencySymbol =
+          NumberFormat.simpleCurrency(name: userData.data.userCurrencyCode)
+              .currencySymbol;
       countryCode = userData.data.userCountryCode;
       availBalance = widget.coinDetails[widget.index].balance.toString();
       depositAddress = widget.coinDetails[widget.index].address.toString();

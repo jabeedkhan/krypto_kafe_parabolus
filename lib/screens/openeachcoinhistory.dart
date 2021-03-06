@@ -76,7 +76,9 @@ class _OpenEachCoinHistoryState extends State<OpenEachCoinHistory> {
 
   _initialize() async {
     userData = UserData.fromJson(await pref.read(StringConstants.USER_DATA));
-    wallet = NewWallet.fromJson(await pref.read(StringConstants.WALLET_DATA));
+    if (userData.data.walletStatus == 1)
+      wallet = NewWallet.fromJson(
+          await pref.read(StringConstants.WALLET_DATA) ?? NewWallet());
     calculateTimeInterval();
     getCoinData();
     getHistoryData();
@@ -225,8 +227,9 @@ class _OpenEachCoinHistoryState extends State<OpenEachCoinHistory> {
         });
       }
     });
-    index = wallet.coinDetailList
-        .indexWhere((element) => element.coinSymbol == widget.coinSymbol);
+    if (userData.data.walletStatus == 1)
+      index = wallet.coinDetailList
+          .indexWhere((element) => element.coinSymbol == widget.coinSymbol);
   }
 
   _initController() {
