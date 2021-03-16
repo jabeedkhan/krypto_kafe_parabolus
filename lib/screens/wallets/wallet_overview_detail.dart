@@ -144,7 +144,7 @@ class _WalletOverviewDetailState extends State<WalletOverviewDetail> {
   transferDialog(context) {
     return showDialog(
       context: context,
-      child: AlertDialog(
+      builder: (BuildContext context) { return AlertDialog(
           title: Center(child: Text('Transfer To')),
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(10.0))),
@@ -194,7 +194,8 @@ class _WalletOverviewDetailState extends State<WalletOverviewDetail> {
                 ),
               ],
             ),
-          )),
+          ));
+      },
     );
   }
 
