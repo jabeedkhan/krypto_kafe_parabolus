@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>676415329705-m3ki386cp65qa5t8ioqksgv13fd6jcmc.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.676415329705-m3ki386cp65qa5t8ioqksgv13fd6jcmc</string>
+	<key>API_KEY</key>
+	<string>AIzaSyA1EtITDgc7R8_DsAmGE4Q2NSaqPt0ln7Y</string>
+	<key>GCM_SENDER_ID</key>
+	<string>676415329705</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.parabolus.kryptokafe</string>
+	<key>PROJECT_ID</key>
+	<string>kryptokafe-1b0ee</string>
+	<key>STORAGE_BUCKET</key>
+	<string>kryptokafe-1b0ee.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:676415329705:ios:39a2d82ff8e4cde22120b8</string>
+</dict>
+</plist>
